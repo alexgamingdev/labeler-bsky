@@ -84,9 +84,17 @@ jetstream.on('error', (error) => {
 });
 
 jetstream.onCreate(WANTED_COLLECTION, (event: CommitCreateEvent<typeof WANTED_COLLECTION>) => {
-  // Automatische Reaktion auf Interaktionen (Likes/Replies) mit deinen Posts
-  if (event.commit?.record?.subject?.uri?.includes(DID)) {
-    label(event.did, event.commit.record.subject.uri.split('/').pop()!);
+  // Wenn DU einen Post likes, bekommt der Ersteller ein Label
+  if (event.did === DID) {
+    const subjectUri = event.commit?.record?.subject?.uri;
+    if (subjectUri) {
+      // Extrahiere die Ersteller-DID aus der Post-URI (Format: at://did:plc:xxxxx/app.bsky.feed.post/rkey)
+      const posterDid = subjectUri.split('/')[2];
+      if (posterDid && posterDid.startsWith('did:')) {
+        logger.info(`Du likest einen Post von ${posterDid}. Vergebe Label...`);
+        label(posterDid, subjectUri.split('/').pop()!);
+      }
+    }
   }
 });
 
