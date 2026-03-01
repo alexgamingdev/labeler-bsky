@@ -13,6 +13,32 @@ function epochUsToDateTime(cursor: number): string {
   return new Date(cursor / 1000).toISOString();
 }
 
+// --- MANUELLE VERIFIKATION BEIM START ---
+function runManualVerification() {
+  try {
+    if (fs.existsSync('verifiziert.ah')) {
+      const data = fs.readFileSync('verifiziert.ah', 'utf8');
+      const verifiedDids = data
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line.startsWith('did:'));
+
+      logger.info(`${verifiedDids.length} DIDs in verifiziert.ah gefunden. Starte Labeling...`);
+
+      for (const targetDid of verifiedDids) {
+        // Wir nutzen 'verifiziert' als Standard-rkey, da wir manuell labeln
+        label(targetDid, 'verifiziert');
+      }
+    } else {
+      logger.warn('Datei verifiziert.ah nicht gefunden. Erstelle leere Datei...');
+      fs.writeFileSync('verifiziert.ah', '', 'utf8');
+    }
+  } catch (error) {
+    logger.error(`Fehler bei der manuellen Verifikation: ${error}`);
+  }
+}
+
+// --- CURSOR INITIALISIERUNG ---
 try {
   logger.info('Trying to read cursor from cursor.txt...');
   cursor = Number(fs.readFileSync('cursor.txt', 'utf8'));
@@ -58,7 +84,7 @@ jetstream.on('error', (error) => {
 });
 
 jetstream.onCreate(WANTED_COLLECTION, (event: CommitCreateEvent<typeof WANTED_COLLECTION>) => {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  // Automatische Reaktion auf Interaktionen (Likes/Replies) mit deinen Posts
   if (event.commit?.record?.subject?.uri?.includes(DID)) {
     label(event.did, event.commit.record.subject.uri.split('/').pop()!);
   }
@@ -71,6 +97,12 @@ labelerServer.app.listen({ port: PORT, host: HOST }, (error, address) => {
     logger.error('Error starting server: %s', error);
   } else {
     logger.info(`Labeler server listening on ${address}`);
+
+    // Starte die manuelle Verifikation aus der .ah Datei, sobald der Server bereit ist
+    runManualVerification();
+
+    // Wenn du GitHub Actions nutzt: Hier könnte man process.exit(0) einbauen,
+    // damit die Action nach dem Labeln sofort beendet wird.
   }
 });
 
@@ -79,7 +111,9 @@ jetstream.start();
 function shutdown() {
   try {
     logger.info('Shutting down gracefully...');
-    fs.writeFileSync('cursor.txt', jetstream.cursor!.toString(), 'utf8');
+    if (jetstream.cursor) {
+      fs.writeFileSync('cursor.txt', jetstream.cursor.toString(), 'utf8');
+    }
     jetstream.close();
     labelerServer.stop();
     metricsServer.close();

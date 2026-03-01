@@ -1,46 +1,22 @@
 import { Label } from './types.js';
 
-export const DELETE = 'insert-rkey-of-delete-post-here';
+export const DELETE = '3mfz6jlzojn2e'; // Dein neuer Delete-Code
 export const LABEL_LIMIT = 1;
 export const LABELS: Label[] = [
   {
-    rkey: 'insert-rkey-here',
-    identifier: 'earth',
+    rkey: '3mfz6jlugcn22', // Dein neuer Label-Code aus dem Terminal
+    identifier: 'verifiziert',
     locales: [
-      { lang: 'en', name: 'Earth 🌎', description: 'Earth'},
-      { lang: 'pt-BR', name: 'Terra 🌎', description: 'Terra'},
+      { 
+        lang: 'de', 
+        name: 'Verifizierte Identitaet', 
+        description: 'Offiziell geprueft durch news.alexgamingdev.tech' 
+      },
+      { 
+        lang: 'en', 
+        name: 'Verified Identity', 
+        description: 'Officially verified by news.alexgamingdev.tech' 
+      }
     ]
-  },
-  {
-    rkey: 'insert-rkey-here',
-    identifier: 'fire',
-    locales: [
-      { lang: 'en', name: 'Fire 🔥', description: 'Fire'},
-      { lang: 'pt-BR', name: 'Fogo 🔥', description: 'Fogo'},
-    ]
-  },
-  {
-    rkey: 'insert-rkey-here',
-    identifier: 'air',
-    locales: [
-      { lang: 'en', name: 'Air 💨', description: 'Air'},
-      { lang: 'pt-BR', name: 'Ar 💨', description: 'Ar'},
-    ]
-  },
-  {
-    rkey: 'insert-rkey-here',
-    identifier: 'water',
-    locales: [
-      { lang: 'en', name: 'Water 💧', description: 'Water'},
-      { lang: 'pt-BR', name: 'Água 💧', description: 'Água'},
-    ]
-  },
-  {
-    rkey: 'insert-rkey-here',
-    identifier: 'love',
-    locales: [
-      { lang: 'en', name: 'Love 💞', description: 'Love'},
-      { lang: 'pt-BR', name: 'Amor 💞', description: 'Amor'},
-    ]
-  },
+  }
 ];
