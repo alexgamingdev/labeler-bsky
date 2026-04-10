@@ -109,8 +109,12 @@ labelerServer.app.listen({ port: PORT, host: HOST }, (error, address) => {
     // Starte die manuelle Verifikation aus der .ah Datei, sobald der Server bereit ist
     runManualVerification();
 
-    // Wenn du GitHub Actions nutzt: Hier könnte man process.exit(0) einbauen,
-    // damit die Action nach dem Labeln sofort beendet wird.
+    // Im CI-Modus (z.B. GitHub Actions) nach dem Labeln sofort beenden.
+    // Die kurze Verzögerung gibt libsql Zeit, ausstehende Schreibvorgänge abzuschließen.
+    if (process.env.CI) {
+      logger.info('CI-Modus erkannt. Beende Prozess nach dem Labeling...');
+      setTimeout(() => process.exit(0), 1000);
+    }
   }
 });
 
